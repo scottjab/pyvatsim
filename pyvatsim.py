@@ -15,7 +15,7 @@ class VatsimClient(LineReceiver):
 
     def sendResponse(self, controlCode, dest, response):
         rawResponse = '%s%s:%s:%s' % (controlCode,self.callsign,dest,response)
-        print rawResponse
+        print ">> %s" % rawResponse
         self.sendRawResponse(rawResponse)
 
     def serverResponseBuilder(self, controlCode, response):
@@ -29,7 +29,7 @@ class VatsimClient(LineReceiver):
     def lineReceived(self, line):
         controlCode = line[:3]
         splitLine = line[3:].split(':')
-        print "%s: %s" % (controlCode, splitLine)
+        print "<< %s: %s" % (controlCode, splitLine)
         if '$DI' in controlCode:
             if 'CLIENT' in splitLine[1]:
                 cid = ""
