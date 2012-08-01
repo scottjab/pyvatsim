@@ -10,20 +10,31 @@ from vatsimhash import VatHasher
 class VatsimClient(LineReceiver):
     """Vatsim Client protocol"""
 
+    cid = ""
+    password = ""
+
+    callsign = "ZLA_OBS"
+
+    lat = '33.9425'
+    lon = '-118.408056'
+
     def sendRawResponse(self,rawResponse):
+        print ">> %s" % rawResponse
         self.sendLine(rawResponse)
 
-    def sendResponse(self, controlCode, dest, response):
+    def sendResponse(self, controlCode, response):
+        self.sendLine("%s%s:%s"% (controlCode,self.callsign,response))
+    
+    def sendDirectResponse(self, controlCode, dest, response):
         rawResponse = '%s%s:%s:%s' % (controlCode,self.callsign,dest,response)
-        print ">> %s" % rawResponse
+        #print ">> %s" % rawResponse
         self.sendRawResponse(rawResponse)
 
     def serverResponseBuilder(self, controlCode, response):
         response = ":".join(response)
-        self.sendResponse(controlCode,"SERVER",response)
+        self.sendDirectResponse(controlCode,"SERVER",response)
 
     def connectionMade(self):
-        self.callsign = "ZFW_OBS"
         pass
 
     def lineReceived(self, line):
@@ -32,8 +43,6 @@ class VatsimClient(LineReceiver):
         print "<< %s: %s" % (controlCode, splitLine)
         if '$DI' in controlCode:
             if 'CLIENT' in splitLine[1]:
-                cid = ""
-                password = ""
                 self.vathash = VatHasher(splitLine[3])
                 print self.vathash.serverSalt
                 response = []
@@ -41,24 +50,27 @@ class VatsimClient(LineReceiver):
                 response.append("vSTARS")
                 response.append("1")
                 response.append("0")
-                response.append(cid)
+                response.append(self.cid)
                 response.append("462CEBA3")
                 self.serverResponseBuilder("$ID",response)
-                self.sendResponse('#AA','SERVER','Reginald Beardsley:%s:%s:1:100' % (cid,password))
-                self.sendResponse('$CQ','SERVER','$CQZFW_OBS:SERVER:ATC')
-                self.sendResponse('$CQ','SERVER','IP')
-                self.sendRawResponse("%ZFW_OBS:99998:0:150:1:0.00000:0.00000:0")
+                self.sendDirectResponse('#AA','SERVER','Reginald Beardsley:%s:%s:1:100' % (self.cid,self.password))
+                self.sendDirectResponse('$CQ','SERVER','$CQZFW_OBS:SERVER:ATC')
+                self.sendDirectResponse('$CQ','SERVER','IP')
+                self.sendRawResponse("%s%s:99998:0:150:1:%s:%s:0"%("%",self.callsign,self.lat,self.lon))
         elif '#TM' in controlCode:
             if len(splitLine) > 2:
                 print "%s: %s" % (splitLine[0],splitLine[2])
         elif '$CR' in controlCode:
             if 'IP' in splitLine[2]:
-                self.sendResponse('$CR','SERVER','CAPS:VERSION=1:ATCINFO=1')
+                self.sendDirectResponse('$CR','SERVER','CAPS:VERSION=1:ATCINFO=1')
         elif '$ZC' in controlCode:
             response = []
             #print self.vathash.serverSalt
             response.append(self.vathash.hash(splitLine[2]))
             self.serverResponseBuilder('$ZR',response)
+        elif '#DP' in controlCode:
+            self.sendRawResponse("%s%s:99998:0:150:1:%s:%s:0"%("%",self.callsign,self.lat,self.lon))
+
 
 class VatsimClientFactory(ClientFactory):
     """Vatsim Client Factory"""
