@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import hashlib
+from twisted.python import log
 
 
 class VatHasher(object):
@@ -48,6 +49,7 @@ class VatHasher(object):
 		#print "CATHASH: %s" % (catedHash)
 
 		self.lastSalt = hashlib.md5(catHash).hexdigest()
+		log.msg("CHALLENGE %s: COMPUTED HASH %s" % (challenge,computedhash))
 		return computedhash
 
 def main():
