@@ -31,7 +31,7 @@ class VatsimClient(LineReceiver):
         self.sendLine(rawResponse)
 
     def sendResponse(self, controlCode, response):
-        self.sendLine("%s%s:%s"% (controlCode,self.callsign,response))
+        self.sendRawResponse("%s%s:%s"% (controlCode,self.callsign,response))
     
     def sendDirectResponse(self, controlCode, dest, response):
         rawResponse = '%s%s:%s:%s' % (controlCode,self.callsign,dest,response)
