@@ -14,7 +14,7 @@ class VatsimClient(LineReceiver):
     """Vatsim Client protocol"""
     cid = ""
     password = ""
-
+    realname = ""
 
     callsign = "ZAU_OBS"
 
@@ -61,7 +61,7 @@ class VatsimClient(LineReceiver):
                 response.append(self.cid)
                 response.append("462CEBA3")
                 self.serverResponseBuilder("$ID",response)
-                self.sendDirectResponse('#AA','SERVER','Reginald Beardsley:%s:%s:1:100' % (self.cid,self.password))
+                self.sendDirectResponse('#AA','SERVER','%s:%s:%s:1:100' % (self.realname,self.cid,self.password))
                 self.sendDirectResponse('$CQ','SERVER','$CQZFW_OBS:SERVER:ATC')
                 self.sendDirectResponse('$CQ','SERVER','IP')
                 self.sendRawResponse("%s%s:99998:0:150:1:%s:%s:0"%("%",self.callsign,self.lat,self.lon))
