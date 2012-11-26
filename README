@@ -1,3 +1,1 @@
-This is a reverse engineered proof of concept twisted vatsim client.  It is intended to deminstrate the security failures of the vatsim developers. vatsimhash.py impiments the client login hashing for vatsim.
-
-
+This is a reverse engineered proof of concept twisted vatsim client.  It is intended to demonstrate the security failures of the vatsim developers. vatsimhash.py implements the client login hashing for vatsim.
